@@ -11,10 +11,7 @@ public partial class IdentityPlugin
 {
     public void OnTick()
     {
-        var gameRules = Core.EntitySystem.GetGameRules();
-        if (gameRules == null)
-            return;
-        HandleTick(gameRules);
+        HandleTick();
     }
 
     public void OnClientSteamAuthorize(IOnClientSteamAuthorizeEvent @event)
@@ -22,5 +19,12 @@ public partial class IdentityPlugin
         var player = Core.PlayerManager.GetPlayer(@event.PlayerId);
         if (player != null)
             HandleConnectingPlayer(player);
+    }
+
+    public void OnClientProcessUsercmds(IOnClientProcessUsercmdsEvent @event)
+    {
+        var player = Core.PlayerManager.GetPlayer(@event.PlayerId);
+        if (player != null && player.IsValid && !player.IsFakeClient)
+            HandlePlayerInput(player);
     }
 }

@@ -4,7 +4,6 @@
  *--------------------------------------------------------------------------------------------*/
 
 using SwiftlyS2.Shared;
-using SwiftlyS2.Shared.Convars;
 using SwiftlyS2.Shared.GameEventDefinitions;
 using SwiftlyS2.Shared.Plugins;
 
@@ -21,9 +20,16 @@ public partial class IdentityPlugin(ISwiftlyCore core) : BasePlugin(core)
 {
     public override void Load(bool hotReload)
     {
+        Natives.Initialize(Core);
+        Api.Initialize(Core, Url);
+        Core.GameData.ApplyPatch("CCSPlayerController_m_iCompetitiveRankingPatch");
+        Core.GameData.ApplyPatch("CCSPlayerController_m_iCompetitiveRankingCleanupPatch");
+        Core.GameData.ApplyPatch("CCSPlayerController_m_iCompetitiveRankTypePatch");
         Core.Event.OnTick += OnTick;
         Core.Event.OnClientSteamAuthorize += OnClientSteamAuthorize;
+        Core.Event.OnClientProcessUsercmds += OnClientProcessUsercmds;
         Core.GameEvent.HookPre<EventPlayerDisconnect>(OnPlayerDisconnect);
+        Natives.CCSPlayerController_SetPlayerName.AddHook(OnSetPlayerName);
     }
 
     public override void Unload() { }

@@ -8,15 +8,15 @@ using Microsoft.Extensions.Logging;
 using SwiftlyS2.Shared.Events;
 using SwiftlyS2.Shared.Players;
 using SwiftlyS2.Shared.ProtobufDefinitions;
-using SwiftlyS2.Shared.SchemaDefinitions;
 
 namespace IdentityPlugin;
 
 public partial class IdentityPlugin
 {
-    public readonly ConcurrentDictionary<ulong, bool> PendingFetchPlayers = [];
-    public readonly ConcurrentDictionary<ulong, User> PlayersOnTick = [];
+    public readonly ConcurrentDictionary<ulong, bool> UserInFetchManager = [];
+    public readonly ConcurrentDictionary<ulong, User> UserManager = [];
     public readonly ConcurrentDictionary<ulong, GameButtonFlags> LastPlayerPressedButtons = [];
+    public bool LastTeamIntroPeriod = false;
 
     public bool IsEnabled() => Url.Value.Contains("{userId}");
 
@@ -24,14 +24,13 @@ public partial class IdentityPlugin
     {
         var steamId = player.SteamID;
         var name = player.Controller.PlayerName;
-        if (player.IsFakeClient || !IsEnabled() || PendingFetchPlayers.ContainsKey(steamId))
+        if (player.IsFakeClient || !IsEnabled() || UserInFetchManager.ContainsKey(steamId))
             return;
         Core.Logger.LogInformation("Player {Name} (id: {Id}) is authenticating...", name, steamId);
-        PendingFetchPlayers.TryAdd(steamId, true);
-        var user = await FetchUser(steamId);
-        PendingFetchPlayers.Remove(steamId, out _);
-        Core.Logger.LogInformation("Player {Name} (id: {Id}) is authenticated.", name, steamId);
-        Core.Scheduler.NextTick(() =>
+        UserInFetchManager.TryAdd(steamId, true);
+        var user = await Api.FetchUser(steamId);
+        UserInFetchManager.Remove(steamId, out _);
+        Core.Scheduler.NextWorldUpdate(() =>
         {
             if (!player.Controller.IsValid)
             {
@@ -52,59 +51,70 @@ public partial class IdentityPlugin
                 return;
             }
             user.Player = player;
-            if (IsForceNickname.Value || IsForceRating.Value)
-            {
-                PlayersOnTick.TryAdd(player.SteamID, user);
-                Core.Logger.LogInformation("Player {Name} has rating {Rating}.", name, user.Rating);
-            }
+            UserManager.TryAdd(player.SteamID, user);
+            if (IsForceNickname.Value)
+                player.Controller.SetName(user.Nickname);
+            if (IsForceRating.Value)
+                player.Controller.SetRating(user.Rating);
             if (user.Flags.Length > 0)
-            {
                 foreach (var flag in user.Flags)
                     Core.Permission.AddPermission(steamId, flag);
-                Core.Logger.LogInformation("Player {Name} has flags {Flags}.", name, user.Flags);
-            }
+            Core.Logger.LogInformation(
+                "Player {Name} (id: {Id}) is authenticated (rating={Rating}, flags={Flags}).",
+                name,
+                steamId,
+                user.Rating,
+                user.Flags
+            );
         });
     }
 
-    public void HandleTick(CCSGameRules gameRules)
+    public void HandleTick()
     {
-        var revealRecipients = new List<int>();
-        foreach (var (steamId, user) in PlayersOnTick)
+        if (!IsForceRating.Value)
+            return;
+        var teamIntroPeriod = Core.EntitySystem.GetGameRules()?.TeamIntroPeriod;
+        if (teamIntroPeriod == null)
+            return;
+        var isUpdateRating = LastTeamIntroPeriod != teamIntroPeriod;
+        LastTeamIntroPeriod = teamIntroPeriod.Value;
+        if (!isUpdateRating)
+            return;
+        foreach (var (_, user) in UserManager)
             if (user.Player?.IsValid == true)
-            {
-                if (IsForceNickname.Value)
-                    user.Player.SetName(user.Nickname);
-                if (IsForceRating.Value)
-                    if (gameRules.TeamIntroPeriod)
-                        user.Player.HideRating();
-                    else
-                        user.Player.SetRating(user.Rating);
-                var pressedButtons = user.Player.PressedButtons;
-                var lastPressedButtons = LastPlayerPressedButtons.GetOrAdd(
-                    steamId,
-                    GameButtonFlags.None
+                if (teamIntroPeriod.Value)
+                    user.Player.Controller.HideRating();
+                else
+                    user.Player.Controller.SetRating(user.Rating);
+    }
+
+    public void HandlePlayerInput(IPlayer player)
+    {
+        if (IsForceRating.Value && UserManager.TryGetValue(player.SteamID, out var user))
+        {
+            var pressedButtons = player.PressedButtons;
+            var lastPressedButtons = LastPlayerPressedButtons.GetOrAdd(
+                player.SteamID,
+                GameButtonFlags.None
+            );
+            var isSendNetMessage = (
+                (pressedButtons & GameButtonFlags.Tab) != 0
+                && (lastPressedButtons & GameButtonFlags.Tab) == 0
+            );
+            LastPlayerPressedButtons[player.SteamID] = pressedButtons;
+            if (isSendNetMessage)
+                Core.NetMessage.Send<CCSUsrMsg_ServerRankRevealAll>(msg =>
+                    msg.Recipients.AddRecipient(player.PlayerID)
                 );
-                if (
-                    (pressedButtons & GameButtonFlags.Tab) != 0
-                    && (lastPressedButtons & GameButtonFlags.Tab) == 0
-                )
-                    revealRecipients.Add(user.Player.PlayerID);
-                LastPlayerPressedButtons[steamId] = pressedButtons;
-            }
-        if (revealRecipients.Count > 0)
-            Core.NetMessage.Send<CCSUsrMsg_ServerRankRevealAll>(msg =>
-            {
-                foreach (var playerID in revealRecipients)
-                    msg.Recipients.AddRecipient(playerID);
-            });
+        }
     }
 
     public void HandleDisconnectingPlayer(IPlayer player)
     {
         if (player.IsFakeClient)
             return;
-        foreach (var (steamId, user) in PlayersOnTick)
+        foreach (var (steamId, user) in UserManager)
             if (steamId == player.SteamID || user.Player?.IsValid != true)
-                PlayersOnTick.TryRemove(steamId, out _);
+                UserManager.TryRemove(steamId, out _);
     }
 }
