@@ -14,7 +14,7 @@ public static partial class Natives
     private static readonly Lazy<
         IUnmanagedFunction<CCSPlayerController_SetPlayerNameDelegate>
     > _lazySetPlayerName = new(() =>
-        FromSignature<CCSPlayerController_SetPlayerNameDelegate>(
+        GetFunctionBySignature<CCSPlayerController_SetPlayerNameDelegate>(
             "CCSPlayerController::SetPlayerName"
         )
     );
