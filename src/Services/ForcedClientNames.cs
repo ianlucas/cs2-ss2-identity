@@ -23,4 +23,9 @@ public static class ForcedClientNames
     {
         return _forcedNames.SetForcedName(steamAccountId, forcedName);
     }
+
+    public static bool RemoveForcedName(uint steamAccountId)
+    {
+        return _forcedNames.RemoveForcedName(steamAccountId);
+    }
 }

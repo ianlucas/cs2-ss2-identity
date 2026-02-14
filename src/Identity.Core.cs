@@ -68,7 +68,7 @@ public partial class Identity
                 return;
             }
             if (ConVars.IsForceNickname.Value)
-                player.Controller.SetPlayerName(user.Nickname);
+                player.SetForcedName(user.Nickname);
             if (
                 ConVars.IsForceRating.Value
                 && Core.EntitySystem.GetGameRules()?.TeamIntroPeriod != true
@@ -108,6 +108,7 @@ public partial class Identity
     {
         if (player.IsFakeClient)
             return;
+        player.RemoveForcedName();
         player.RemoveState();
     }
 }

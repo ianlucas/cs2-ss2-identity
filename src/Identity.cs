@@ -6,6 +6,7 @@
 using SwiftlyS2.Shared;
 using SwiftlyS2.Shared.GameEventDefinitions;
 using SwiftlyS2.Shared.Plugins;
+using SwiftlyS2.Shared.SteamAPI;
 
 namespace Identity;
 
@@ -22,6 +23,7 @@ public partial class Identity(ISwiftlyCore core) : BasePlugin(core)
     {
         Swiftly.Initialize();
         ConVars.Initialize();
+        ForcedClientNames.Initialize();
         Core.GameData.ApplyPatch("CCSPlayerController::m_iCompetitiveRanking1");
         Core.GameData.ApplyPatch("CCSPlayerController::m_iCompetitiveRanking2");
         Core.GameData.ApplyPatch("CCSPlayerController::m_iCompetitiveRankType1");
@@ -29,7 +31,6 @@ public partial class Identity(ISwiftlyCore core) : BasePlugin(core)
         Core.Event.OnClientSteamAuthorize += OnClientSteamAuthorize;
         Core.Event.OnClientProcessUsercmds += OnClientProcessUsercmds;
         Core.GameEvent.HookPre<EventPlayerDisconnect>(OnPlayerDisconnect);
-        Natives.CCSPlayerController_SetPlayerName.AddHook(OnSetPlayerName);
     }
 
     public override void Unload() { }

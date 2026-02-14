@@ -5,6 +5,7 @@
 
 using System.Collections.Concurrent;
 using SwiftlyS2.Shared.Players;
+using SwiftlyS2.Shared.SteamAPI;
 
 namespace Identity;
 
@@ -22,6 +23,22 @@ public static class IPlayerExtensions
         public void RemoveState()
         {
             _playerStateManager.TryRemove(self.SteamID, out var _);
+        }
+
+        public void SetForcedName(string name)
+        {
+            ForcedClientNames.SetForcedName(
+                new CSteamID(self.SteamID).GetAccountID().m_AccountID,
+                name
+            );
+            self.Controller.SetPlayerName(name);
+        }
+
+        public void RemoveForcedName()
+        {
+            ForcedClientNames.RemoveForcedName(
+                new CSteamID(self.SteamID).GetAccountID().m_AccountID
+            );
         }
     }
 }
