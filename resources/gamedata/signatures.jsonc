@@ -13,11 +13,5 @@
     "lib": "server",
     "linux": "44 88 BB ? ? ? ? 48 8B 40",
     "windows": "40 88 AF ? ? ? ? 48 8B 0D"
-  },
-
-  "CCSPlayerController::SetPlayerName": {
-    "lib": "server",
-    "linux": "48 85 F6 0F 84 ? ? ? ? 55 BA",
-    "windows": "48 83 EC ? 48 85 D2 74 ? 48 89 5C 24"
   }
 }

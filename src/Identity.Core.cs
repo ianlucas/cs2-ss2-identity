@@ -14,6 +14,17 @@ public partial class Identity
 {
     public void HandleTick()
     {
+        var players =
+            ConVars.IsForceNickname.Value && Swiftly.Core.Engine.GlobalVars.TickCount % 64 == 0
+                ? Core.PlayerManager.GetAllPlayers()
+                : null;
+        if (players != null)
+            foreach (var player in players)
+            {
+                var nickname = player.GetState().Data?.Nickname;
+                if (nickname != null)
+                    player.Controller.SetPlayerName(nickname);
+            }
         if (!ConVars.IsForceRating.Value)
             return;
         var gameRules = Core.EntitySystem.GetGameRules();
@@ -24,7 +35,8 @@ public partial class Identity
         gameRules.LastTeamIntroPeriod = teamIntroPeriod;
         if (!isUpdateRating)
             return;
-        foreach (var player in Core.PlayerManager.GetAllPlayers())
+        players ??= Core.PlayerManager.GetAllPlayers();
+        foreach (var player in players)
             if (!player.IsFakeClient)
             {
                 var rating = player.GetState().Data?.Rating;
