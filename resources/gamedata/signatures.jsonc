@@ -27,7 +27,7 @@
   "CCSPlayerController::m_iszPlayerName3": {
     "lib": "server",
     "linux": "55 48 89 E5 41 57 41 56 41 55 4C 8D 6D ? 41 54 49 89 F4 53 48 89 FB 48 83 EC ? E8 ? ? ? ? 4C 8D 35",
-    "windows": "48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 48 83 EC ? 48 8B EA 48 8B F9 E8 ? ? ? ? 48 8B 05"
+    "windows": "48 89 5C 24 ? 48 89 6C 24 ? 56 57 41 56 48 83 EC ? 48 8B EA 48 8B F9 E8 ? ? ? ? 48 8B 05"
   },
   "CCSPlayerController::m_iszPlayerName4": {
     "lib": "server",
