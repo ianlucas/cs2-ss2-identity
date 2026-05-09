@@ -12,7 +12,7 @@ public static partial class Natives
     public delegate void CCSPlayerController_m_iszPlayerName1Delegate(nint a1, nint a2);
 
     public static readonly IUnmanagedFunction<CCSPlayerController_m_iszPlayerName1Delegate> CCSPlayerController_m_iszPlayerName1 =
-        GetFunctionBySignature<CCSPlayerController_m_iszPlayerName1Delegate>(
+        ResolveFunction<CCSPlayerController_m_iszPlayerName1Delegate>(
             "CCSPlayerController::m_iszPlayerName1"
         );
 }

@@ -7,7 +7,7 @@ using SwiftlyS2.Shared.Events;
 
 namespace Identity;
 
-public class IPlayerState
+public class PlayerState
 {
     public bool IsFetching = false;
     public User? Data;

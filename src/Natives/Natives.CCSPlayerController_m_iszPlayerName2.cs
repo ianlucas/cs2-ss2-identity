@@ -17,7 +17,7 @@ public static partial class Natives
     );
 
     public static readonly IUnmanagedFunction<CCSPlayerController_m_iszPlayerName2Delegate> CCSPlayerController_m_iszPlayerName2 =
-        GetFunctionBySignature<CCSPlayerController_m_iszPlayerName2Delegate>(
+        ResolveFunction<CCSPlayerController_m_iszPlayerName2Delegate>(
             "CCSPlayerController::m_iszPlayerName2"
         );
 }

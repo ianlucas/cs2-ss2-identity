@@ -11,20 +11,39 @@ public partial class Identity
 {
     public void OnTick()
     {
-        HandleTick();
+        if (!ConVars.ForceRating.Value)
+            return;
+        var gameRules = Core.EntitySystem.GetGameRules();
+        if (gameRules == null)
+            return;
+        var teamIntroPeriod = gameRules.TeamIntroPeriod;
+        var isUpdateRating = gameRules.LastTeamIntroPeriod != teamIntroPeriod;
+        gameRules.LastTeamIntroPeriod = teamIntroPeriod;
+        if (!isUpdateRating)
+            return;
+        var players = Core.PlayerManager.GetAllPlayers();
+        foreach (var player in players)
+            if (!player.IsFakeClient)
+            {
+                var rating = player.GetState().Data?.Rating;
+                if (teamIntroPeriod)
+                    player.Controller.HideCompetitiveRanking();
+                else if (rating != null)
+                    player.Controller.SetCompetitiveRanking(rating.Value);
+            }
     }
 
     public void OnClientSteamAuthorize(IOnClientSteamAuthorizeEvent @event)
     {
         var player = Core.PlayerManager.GetPlayer(@event.PlayerId);
-        if (player != null)
-            HandleClientSteamAuthorize(player);
+        if (player != null && !player.IsFakeClient)
+            player.AuthenticateAsync();
     }
 
     public void OnClientProcessUsercmds(IOnClientProcessUsercmdsEvent @event)
     {
         var player = Core.PlayerManager.GetPlayer(@event.PlayerId);
         if (player != null && player.IsValid && !player.IsFakeClient)
-            HandleClientProcessUsercmds(player);
+            player.TrySendRankReveal();
     }
 }

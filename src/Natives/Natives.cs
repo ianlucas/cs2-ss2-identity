@@ -9,9 +9,7 @@ namespace Identity;
 
 public static partial class Natives
 {
-    private static IUnmanagedFunction<TDelegate> GetFunctionBySignature<TDelegate>(
-        string signatureName
-    )
+    private static IUnmanagedFunction<TDelegate> ResolveFunction<TDelegate>(string signatureName)
         where TDelegate : Delegate
     {
         nint? address = Swiftly.Core.GameData.GetSignature(signatureName);

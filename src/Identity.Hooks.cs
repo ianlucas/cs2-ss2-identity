@@ -18,7 +18,7 @@ public partial class Identity
             next()(a1, a2);
             var controller = Swiftly.Core.Memory.ToSchemaClass<CCSPlayerController>(a1);
             if (controller.IsValid)
-                HandleClientPlayerNameChange(controller);
+                controller.EnforceNickname();
         };
     }
 
@@ -31,7 +31,7 @@ public partial class Identity
             var ret = next()(a1, a2, a3, a4);
             var controller = Swiftly.Core.Memory.ToSchemaClass<CCSPlayerController>(a1);
             if (controller.IsValid)
-                HandleClientPlayerNameChange(controller);
+                controller.EnforceNickname();
             return ret;
         };
     }
@@ -45,7 +45,7 @@ public partial class Identity
             var ret = next()(a1, a2);
             var controller = Swiftly.Core.Memory.ToSchemaClass<CCSPlayerController>(a1);
             if (controller.IsValid)
-                HandleClientPlayerNameChange(controller);
+                controller.EnforceNickname();
             return ret;
         };
     }
@@ -59,7 +59,7 @@ public partial class Identity
             var ret = next()(a1);
             var controller = Swiftly.Core.Memory.ToSchemaClass<CCSPlayerController>(a1);
             if (controller.IsValid)
-                HandleClientPlayerNameChange(controller);
+                controller.EnforceNickname();
             return ret;
         };
     }
