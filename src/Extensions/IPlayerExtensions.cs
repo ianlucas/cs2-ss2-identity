@@ -32,9 +32,9 @@ public static class IPlayerExtensions
             var steamId = self.SteamID;
             var name = self.Controller.PlayerName;
             var playerState = self.GetState();
-            if (self.IsFakeClient || !Api.IsActive || playerState.IsFetching)
+            if (self.IsFakeClient || !Api.IsConfigured || playerState.IsFetching)
                 return;
-            Swiftly.Core.Logger.LogInformation(
+            Runtime.Core.Logger.LogInformation(
                 "Player {Name} (id: {Id}) is authenticating...",
                 name,
                 steamId
@@ -43,11 +43,11 @@ public static class IPlayerExtensions
             var user = await Api.FetchUserAsync(steamId);
             playerState.Data = user;
             playerState.IsFetching = false;
-            Swiftly.Core.Scheduler.NextWorldUpdate(() =>
+            Runtime.Core.Scheduler.NextWorldUpdate(() =>
             {
                 if (!self.Controller.IsValid)
                 {
-                    Swiftly.Core.Logger.LogInformation(
+                    Runtime.Core.Logger.LogInformation(
                         "Player {Name} (id: {Id}) is no longer valid.",
                         name,
                         steamId
@@ -67,13 +67,13 @@ public static class IPlayerExtensions
                     self.Controller.SetPlayerName(user.Nickname);
                 if (
                     ConVars.ForceRating.Value
-                    && Swiftly.Core.EntitySystem.GetGameRules()?.TeamIntroPeriod != true
+                    && Runtime.Core.EntitySystem.GetGameRules()?.TeamIntroPeriod != true
                 )
                     self.Controller.SetCompetitiveRanking(user.Rating);
                 if (user.Flags.Length > 0)
                     foreach (var flag in user.Flags)
-                        Swiftly.Core.Permission.AddPermission(steamId, flag);
-                Swiftly.Core.Logger.LogInformation(
+                        Runtime.Core.Permission.AddPermission(steamId, flag);
+                Runtime.Core.Logger.LogInformation(
                     "Player {Name} (id: {Id}) is authenticated (rating={Rating}, flags={Flags}).",
                     name,
                     steamId,
@@ -95,7 +95,7 @@ public static class IPlayerExtensions
             );
             playerState.LastPressedButtons = pressedButtons;
             if (isSendNetMessage)
-                Swiftly.Core.NetMessage.Send<CCSUsrMsg_ServerRankRevealAll>(msg =>
+                Runtime.Core.NetMessage.Send<CCSUsrMsg_ServerRankRevealAll>(msg =>
                     msg.Recipients.AddRecipient(self.PlayerID)
                 );
         }

@@ -10,38 +10,24 @@ namespace Identity;
 
 public static class Api
 {
-    private static readonly HttpClient _httpClient = new() { Timeout = TimeSpan.FromSeconds(30) };
+    private static readonly HttpClient _httpClient = new() { Timeout = TimeSpan.FromSeconds(5) };
 
-    private const int MaxRetries = 3;
-
-    private const int RetryDelayMs = 100;
-
-    public static bool IsActive => ConVars.Url.Value.Contains("{userId}");
+    public static bool IsConfigured => ConVars.Url.Value.Contains("{userId}");
 
     public static async Task<User?> FetchUserAsync(ulong steamId)
     {
         var url = ConVars.Url.Value.Replace("{userId}", steamId.ToString());
-        for (var attempt = 1; attempt <= MaxRetries; attempt++)
-            try
-            {
-                var response = await _httpClient.GetAsync(url);
-                response.EnsureSuccessStatusCode();
-                var jsonContent = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<User>(jsonContent);
-            }
-            catch (Exception error)
-            {
-                Swiftly.Core.Logger.LogError(
-                    "GET {Url} failed (attempt {Attempt}/{MaxRetries}): {Message}",
-                    url,
-                    attempt,
-                    MaxRetries,
-                    error.Message
-                );
-                if (attempt == MaxRetries)
-                    return null;
-                await Task.Delay(TimeSpan.FromMilliseconds(RetryDelayMs * attempt));
-            }
-        return null;
+        try
+        {
+            var response = await _httpClient.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+            var jsonContent = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<User>(jsonContent);
+        }
+        catch (Exception error)
+        {
+            Runtime.Core.Logger.LogError("GET {Url} failed: {Message}", url, error.Message);
+            return null;
+        }
     }
 }

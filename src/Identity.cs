@@ -20,7 +20,7 @@ public partial class Identity(ISwiftlyCore core) : BasePlugin(core)
 {
     public override void Load(bool hotReload)
     {
-        Swiftly.Initialize();
+        Runtime.Initialize();
         ConVars.Initialize();
         Core.GameData.ApplyPatch("CCSPlayerController::m_iCompetitiveRanking1");
         Core.GameData.ApplyPatch("CCSPlayerController::m_iCompetitiveRanking2");
