@@ -13,8 +13,8 @@ public partial class Identity
     public static HookResult OnPlayerDisconnect(EventPlayerDisconnect @event)
     {
         var player = @event.UserIdPlayer;
-        if (player?.IsFakeClient == false)
-            player.HandleDisconnect();
+        if (player != null && !player.IsFakeClient)
+            player.OnDisconnect();
         return HookResult.Continue;
     }
 }

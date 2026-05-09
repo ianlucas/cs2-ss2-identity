@@ -19,12 +19,12 @@ public static class ConVars
         "Kick players when their identity data cannot be retrieved.",
         true
     );
-    public static readonly IConVar<bool> IsForceNickname = Swiftly.Core.ConVar.CreateOrFind(
+    public static readonly IConVar<bool> ForceNickname = Swiftly.Core.ConVar.CreateOrFind(
         "identity_force_nickname",
         "Override player nicknames with their identity nickname.",
         true
     );
-    public static readonly IConVar<bool> IsForceRating = Swiftly.Core.ConVar.CreateOrFind(
+    public static readonly IConVar<bool> ForceRating = Swiftly.Core.ConVar.CreateOrFind(
         "identity_force_rating",
         "Override player ratings with their identity rating.",
         true
@@ -34,7 +34,7 @@ public static class ConVars
     {
         _ = Url;
         _ = IsStrict;
-        _ = IsForceNickname;
-        _ = IsForceRating;
+        _ = ForceNickname;
+        _ = ForceRating;
     }
 }

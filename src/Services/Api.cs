@@ -16,9 +16,9 @@ public static class Api
 
     private const int RetryDelayMs = 100;
 
-    public static bool IsActive() => ConVars.Url.Value.Contains("{userId}");
+    public static bool IsActive => ConVars.Url.Value.Contains("{userId}");
 
-    public static async Task<User?> FetchUser(ulong steamId)
+    public static async Task<User?> FetchUserAsync(ulong steamId)
     {
         var url = ConVars.Url.Value.Replace("{userId}", steamId.ToString());
         for (var attempt = 1; attempt <= MaxRetries; attempt++)

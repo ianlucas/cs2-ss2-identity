@@ -13,26 +13,26 @@ namespace Identity;
 
 public static class IPlayerExtensions
 {
-    private static readonly ConcurrentDictionary<ulong, IPlayerState> _playerStateManager = [];
+    private static readonly ConcurrentDictionary<ulong, PlayerState> _states = [];
 
     extension(IPlayer self)
     {
-        public IPlayerState GetState()
+        public PlayerState GetState()
         {
-            return _playerStateManager.GetOrAdd(self.SteamID, _ => new());
+            return _states.GetOrAdd(self.SteamID, _ => new());
         }
 
-        public void RemoveState()
+        public void ClearState()
         {
-            _playerStateManager.TryRemove(self.SteamID, out var _);
+            _states.TryRemove(self.SteamID, out var _);
         }
 
-        public async void HandleSteamAuthorize()
+        public async void AuthenticateAsync()
         {
             var steamId = self.SteamID;
             var name = self.Controller.PlayerName;
             var playerState = self.GetState();
-            if (self.IsFakeClient || !Api.IsActive() || playerState.IsFetching)
+            if (self.IsFakeClient || !Api.IsActive || playerState.IsFetching)
                 return;
             Swiftly.Core.Logger.LogInformation(
                 "Player {Name} (id: {Id}) is authenticating...",
@@ -40,7 +40,7 @@ public static class IPlayerExtensions
                 steamId
             );
             playerState.IsFetching = true;
-            var user = await Api.FetchUser(steamId);
+            var user = await Api.FetchUserAsync(steamId);
             playerState.Data = user;
             playerState.IsFetching = false;
             Swiftly.Core.Scheduler.NextWorldUpdate(() =>
@@ -63,10 +63,10 @@ public static class IPlayerExtensions
                         );
                     return;
                 }
-                if (ConVars.IsForceNickname.Value)
+                if (ConVars.ForceNickname.Value)
                     self.Controller.SetPlayerName(user.Nickname);
                 if (
-                    ConVars.IsForceRating.Value
+                    ConVars.ForceRating.Value
                     && Swiftly.Core.EntitySystem.GetGameRules()?.TeamIntroPeriod != true
                 )
                     self.Controller.SetCompetitiveRanking(user.Rating);
@@ -83,9 +83,9 @@ public static class IPlayerExtensions
             });
         }
 
-        public void HandleProcessUsercmds()
+        public void TrySendRankReveal()
         {
-            if (!ConVars.IsForceRating.Value)
+            if (!ConVars.ForceRating.Value)
                 return;
             var playerState = self.GetState();
             var pressedButtons = self.PressedButtons;
@@ -100,9 +100,9 @@ public static class IPlayerExtensions
                 );
         }
 
-        public void HandleDisconnect()
+        public void OnDisconnect()
         {
-            self.RemoveState();
+            self.ClearState();
         }
     }
 }

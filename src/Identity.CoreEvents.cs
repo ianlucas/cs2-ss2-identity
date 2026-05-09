@@ -11,7 +11,7 @@ public partial class Identity
 {
     public void OnTick()
     {
-        if (!ConVars.IsForceRating.Value)
+        if (!ConVars.ForceRating.Value)
             return;
         var gameRules = Core.EntitySystem.GetGameRules();
         if (gameRules == null)
@@ -36,14 +36,14 @@ public partial class Identity
     public void OnClientSteamAuthorize(IOnClientSteamAuthorizeEvent @event)
     {
         var player = Core.PlayerManager.GetPlayer(@event.PlayerId);
-        if (player != null)
-            player.HandleSteamAuthorize();
+        if (player != null && !player.IsFakeClient)
+            player.AuthenticateAsync();
     }
 
     public void OnClientProcessUsercmds(IOnClientProcessUsercmdsEvent @event)
     {
         var player = Core.PlayerManager.GetPlayer(@event.PlayerId);
         if (player != null && player.IsValid && !player.IsFakeClient)
-            player.HandleProcessUsercmds();
+            player.TrySendRankReveal();
     }
 }

@@ -33,7 +33,7 @@ public static class CCSPlayerControllerExtensions
             self.CompetitiveRankTypeUpdated();
         }
 
-        public void HandlePlayerNameChange()
+        public void EnforceNickname()
         {
             if (self.SteamID == 0)
                 return;
