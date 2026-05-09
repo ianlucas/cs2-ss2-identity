@@ -32,5 +32,14 @@ public static class CCSPlayerControllerExtensions
             self.CompetitiveRankType = 0;
             self.CompetitiveRankTypeUpdated();
         }
+
+        public void HandlePlayerNameChange()
+        {
+            if (self.SteamID == 0)
+                return;
+            var nickname = self.ToPlayer()?.GetState().Data?.Nickname;
+            if (nickname != null)
+                self.SetPlayerName(nickname);
+        }
     }
 }
