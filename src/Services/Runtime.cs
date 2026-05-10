@@ -14,5 +14,5 @@ public static class Runtime
     public static ISwiftlyCore Core { get; set; } = null!;
 
     public static void Initialize() =>
-        RuntimeHelpers.RunClassConstructor(typeof(ConVars).TypeHandle);
+        RuntimeHelpers.RunClassConstructor(typeof(Runtime).TypeHandle);
 }
