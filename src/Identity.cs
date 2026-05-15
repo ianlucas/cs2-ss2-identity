@@ -14,7 +14,7 @@ namespace Identity;
     Version = "1.0.0",
     Name = "Identity",
     Author = "Ian Lucas",
-    Description = "A plugin for authenticating users."
+    Description = "A SwiftlyS2 plugin for authenticating users"
 )]
 public partial class Identity(ISwiftlyCore core) : BasePlugin(core)
 {
