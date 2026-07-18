@@ -27,7 +27,7 @@ public partial class Identity(ISwiftlyCore core) : BasePlugin(core)
         Core.GameData.ApplyPatch("CCSPlayerController::m_iCompetitiveRankType1");
         Core.Event.OnTick += OnTick;
         Core.Event.OnClientSteamAuthorize += OnClientSteamAuthorize;
-        Core.Event.OnClientProcessUsercmds += OnClientProcessUsercmds;
+        Core.GameHooks.Controller.ProcessUsercmds.Pre += OnClientProcessUsercmds;
         Core.GameEvent.HookPre<EventPlayerDisconnect>(OnPlayerDisconnect);
         Natives.CCSPlayerController_m_iszPlayerName1.AddHook(OnSetPlayerName1);
         Natives.CCSPlayerController_m_iszPlayerName2.AddHook(OnSetPlayerName2);

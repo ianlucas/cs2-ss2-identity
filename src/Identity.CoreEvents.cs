@@ -39,11 +39,4 @@ public partial class Identity
         if (player != null && !player.IsFakeClient)
             player.AuthenticateAsync();
     }
-
-    public void OnClientProcessUsercmds(IOnClientProcessUsercmdsEvent @event)
-    {
-        var player = Core.PlayerManager.GetPlayer(@event.PlayerId);
-        if (player != null && player.IsValid && !player.IsFakeClient)
-            player.TrySendRankReveal();
-    }
 }
