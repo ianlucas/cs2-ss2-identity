@@ -2,7 +2,7 @@
   "CCSPlayerController::m_iCompetitiveRanking1": {
     "signature": "CCSPlayerController::m_iCompetitiveRanking1",
     "linux": "90 90 90 90 90 90 90",
-    "windows": "90 90 90 90 90 90 90"
+    "windows": "90 90 90 90 90 90"
   },
   "CCSPlayerController::m_iCompetitiveRanking2": {
     "signature": "CCSPlayerController::m_iCompetitiveRanking2",
