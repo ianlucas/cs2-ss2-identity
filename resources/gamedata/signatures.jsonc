@@ -1,34 +1,60 @@
 {
+  // 1. Search for the "GMR_BeginRound\n" string, its function calls a CCSPlayerController virtual
+  //    on each controller (index 278 on Linux and 276 on Windows).
+  // 2. That virtual ends by calling the function that updates the controller's ping every 10 ticks
+  //    and, from a global list of players, its competitive ranking, wins and rank type.
+  // 3. The signature starts where the player's ranking is stored in m_iCompetitiveRanking, where
+  //    the patch is written.
   "CCSPlayerController::m_iCompetitiveRanking1": {
     "lib": "server",
     "linux": "44 89 BB ? ? ? ? 48 8B 40 ? 4A 8B 44 F0 ? 44 8B 78 ? 44 3B BB",
     "windows": "89 AF ? ? ? ? 48 8B 0D ? ? ? ? 48 8B 44 D9 ? 8B 68 ? 39 AF ? ? ? ? 74 ? BA ? ? ? ? 48 8D 8F ? ? ? ? 41 B8 ? ? ? ? E8 ? ? ? ? 89 AF ? ? ? ? 48 8B 0D ? ? ? ? 48 8B 44 D9 ? 0F B6 68"
   },
+  // 1. Find the function from CCSPlayerController::m_iCompetitiveRanking1 (see above).
+  // 2. The signature starts where m_iCompetitiveRanking is reset to 0, where the patch is written.
   "CCSPlayerController::m_iCompetitiveRanking2": {
     "lib": "server",
     "linux": "C7 83 ? ? ? ? ? ? ? ? 85 D2 0F 84 ? ? ? ? E9 ? ? ? ? 66 2E 0F 1F 84 00",
     "windows": "44 89 AF ? ? ? ? 44 39 AF ? ? ? ? 74 ? BA ? ? ? ? 48 8D 8F ? ? ? ? 41 B8 ? ? ? ? E8 ? ? ? ? 44 89 AF ? ? ? ? 48 83 C4"
   },
+  // 1. Find the function from CCSPlayerController::m_iCompetitiveRanking1 (see above).
+  // 2. The signature starts where the player's rank type is stored in m_iCompetitiveRankType (a
+  //    byte), where the patch is written.
   "CCSPlayerController::m_iCompetitiveRankType1": {
     "lib": "server",
     "linux": "44 88 BB ? ? ? ? 48 8B 40",
     "windows": "40 88 AF ? ? ? ? 48 8B 0D"
   },
+  // 1. Search for the "player_changename" string.
+  // 2. Pick the function that also references the "oldname", "newname" and "fov_desired" strings.
+  // 3. After firing the event, it calls SetPlayerName(controller, newName), which copies the name
+  //    into m_iszPlayerName.
   "CCSPlayerController::m_iszPlayerName1": {
     "lib": "server",
     "linux": "48 85 F6 0F 84 ? ? ? ? 55 BA",
     "windows": "48 83 EC ? 48 85 D2 74 ? 48 89 5C 24"
   },
+  // 1. Find the CBasePlayerController vtable.
+  //    Linux: _ZTV21CBasePlayerController, functions start 0x10 after it.
+  //    Windows: xref ??_R4CBasePlayerController@@6B@, functions start 8 bytes after that xref.
+  // 2. Take the function at index 248 on Linux and 247 on Windows.
+  // 3. It copies its name argument into m_iszPlayerName and sets or clears FL_FAKECLIENT (256) from
+  //    its bool argument.
   "CCSPlayerController::m_iszPlayerName2": {
     "lib": "server",
     "linux": "55 48 89 E5 41 57 41 56 41 55 41 89 D5 41 54 49 89 CC",
     "windows": "48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 48 83 EC ? 49 8B D9 41 0F B6 E8"
   },
+  // 1. Find the CBasePlayerController vtable (see above).
+  // 2. Take the function at index 10 on Linux and 9 on Windows.
+  // 3. It reads "playername", "fakeclient" and "is_hltv" from its KeyValues argument.
   "CCSPlayerController::m_iszPlayerName3": {
     "lib": "server",
     "linux": "55 48 89 E5 41 57 41 56 41 55 4C 8D AD ? ? ? ? 41 54 49 89 F4 53 48 89 FB 48 81 EC ? ? ? ? E8 ? ? ? ? 4C 8D 35",
     "windows": "48 89 5C 24 ? 48 89 6C 24 ? 56 57 41 56 48 83 EC ? 48 8B F2 48 8B F9 E8"
   },
+  // 1. Search for the "SV: %d(%s) changed min command queue size to %d\n" string, its only xref is
+  //    the controller function that applies the client's settings (name, cl_interp_ratio, ...).
   "CCSPlayerController::m_iszPlayerName4": {
     "lib": "server",
     "linux": "55 48 89 E5 41 57 41 56 41 55 41 54 53 48 89 FB 48 81 EC ? ? ? ? E8 ? ? ? ? 83 F8",
