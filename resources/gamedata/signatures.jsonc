@@ -50,7 +50,7 @@
   // 3. It reads "playername", "fakeclient" and "is_hltv" from its KeyValues argument.
   "CCSPlayerController::m_iszPlayerName3": {
     "lib": "server",
-    "linux": "55 48 89 E5 41 57 41 56 41 55 4C 8D AD ? ? ? ? 41 54 49 89 F4 53 48 89 FB 48 81 EC ? ? ? ? E8 ? ? ? ? 4C 8D 35",
+    "linux": "55 48 89 E5 41 57 41 56 41 55 41 54 49 89 F4 53 48 89 FB 48 83 EC ? E8 ? ? ? ? 4C 8D 2D",
     "windows": "48 89 5C 24 ? 48 89 6C 24 ? 56 57 41 56 48 83 EC ? 48 8B F2 48 8B F9 E8"
   },
   // 1. Search for the "SV: %d(%s) changed min command queue size to %d\n" string, its only xref is
